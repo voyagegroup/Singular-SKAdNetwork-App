@@ -26,9 +26,9 @@
     SKStoreProductViewController *storeViewController = [[SKStoreProductViewController alloc] init];
     storeViewController.delegate = self;
     
-    NSNumber *productID = self.productParameters[@"sourceIdentifier"];
+    NSNumber *productID = self.productParameters[@"id"];
     if (!productID) {
-        NSLog(@"Error: sourceIdentifier is missing in productParameters.");
+        NSLog(@"Error: id is missing in productParameters.");
         return;
     }
     
@@ -44,11 +44,12 @@
         if (error || !result){
             NSLog(@"Error Domain: %@", error.domain);
             NSLog(@"Error Code: %ld", (long)error.code);
-            NSLog(@"Error Description: %@", error.localizedDescription);
-            NSLog(@"Underlying Error: %@", error.userInfo[NSUnderlyingErrorKey]);
-            NSLog(@"URL: %@", error.userInfo[@"AMSURL"]);
+            NSLog(@"Error Description: %@", error.localizedDescription ? error.localizedDescription : @"(no description)");
+            NSLog(@"Underlying Error: %@", error.userInfo[NSUnderlyingErrorKey] ? error.userInfo[NSUnderlyingErrorKey] : @"(no underlying error)");
+            NSLog(@"URL: %@", error.userInfo[@"AMSURL"] ? error.userInfo[@"AMSURL"] : @"(no URL)");
             // Loading the ad failed, try to load another ad or retry the current ad.
         } else {
+            [self presentViewController:storeViewController animated:YES completion:nil];
             NSLog(@"Success: %@", @"Ad loaded successfully! :)");
             // Ad loaded successfully! :)
         }
