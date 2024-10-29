@@ -17,7 +17,7 @@
 - (id)initWithProductParameters:(NSDictionary*)data {
     self = [super init];
     if (self) {
-        _productParameters = data;
+        productParameters = data;
     }
     return self;
 }
@@ -25,22 +25,22 @@
 - (void)viewDidLoad {
     SKStoreProductViewController *storeViewController = [[SKStoreProductViewController alloc] init];
     storeViewController.delegate = self;
-    
-    NSNumber *productID = self.productParameters[@"id"];
-    if (!productID) {
-        NSLog(@"Error: id is missing in productParameters.");
-        return;
-    }
-    
-    NSDictionary *parameters = @{
-        SKStoreProductParameterITunesItemIdentifier: productID
-    };
+
+	NSLog(@"AdNetwork Attribution Signature: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkAttributionSignature]);
+    NSLog(@"AdNetwork Attribution id: %@", [productParameters objectForKey:SKStoreProductParameterITunesItemIdentifier]);
+    NSLog(@"AdNetwork Attribution network id: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkIdentifier]);
+    NSLog(@"AdNetwork Attribution campaign id: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkCampaignIdentifier]);
+    NSLog(@"AdNetwork Attribution timestamp: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkTimestamp]);
+    NSLog(@"AdNetwork Attribution nonce: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkNonce]);
+    NSLog(@"AdNetwork Attribution source app id: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkSourceAppStoreIdentifier]);
+    NSLog(@"AdNetwork Attribution version: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkVersion]);
+    NSLog(@"AdNetwork Attribution sourceIdentifier: %@", [productParameters objectForKey:SKStoreProductParameterAdNetworkSourceIdentifier]);
     
     // Please note that in order to use loadProductWithParameters,
     // Your ViewController must inherit from SKStoreProductViewController
     
     // Step 4: Showing the AppStore window with the product we got from the Ad Network.
-    [storeViewController loadProductWithParameters:parameters completionBlock:^(BOOL result, NSError *error) {
+    [storeViewController loadProductWithParameters:productParameters completionBlock:^(BOOL result, NSError *error) {
         if (error || !result){
             NSLog(@"Error Domain: %@", error.domain);
             NSLog(@"Error Code: %ld", (long)error.code);
