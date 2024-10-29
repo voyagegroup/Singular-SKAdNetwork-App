@@ -17,20 +17,12 @@
 
 @implementation ViewController
 
-// Ad Request Keys
-NSString * const REQUEST_SOURCE_APP_ID_KEY = @"source_app_id";
-NSString * const REQUEST_SKADNETWORK_VERSION_KEY = @"skadnetwork_version";
-
 // Ad Request Values
-NSString * const REQUEST_SOURCE_APP_ID = @"<ENTER_SOURCE_APP_ID_HERE>";
 NSString * const REQUEST_SKADNETWORK_V1 = @"1.0";
 NSString * const REQUEST_SKADNETWORK_V2 = @"2.0";
 NSString * const REQUEST_SKADNETWORK_V22 = @"2.2";
 NSString * const REQUEST_SKADNETWORK_V3 = @"3.0";
 NSString * const REQUEST_SKADNETWORK_V4 = @"4.0";
-
-// We use http for local tests, use https in production.
-NSString * const REQUEST_AD_SERVER_ADDRESS = @"http://<ENTER_YOU_SERVER_IP_HERE>:8000/get-ad-impression";
 
 // Ad Response Keys - These are the same as our server, but real Ad Networks may return different keys.
 NSString * const RESPONSE_AD_NETWORK_ID_KEY = @"adNetworkId";
@@ -70,33 +62,28 @@ NSString *skanVersion = nil;
 }
 
 - (void)getProductDataFromServer {
-    // Building the URL for the GET request to the server
-    NSURLComponents *components = [NSURLComponents componentsWithString:REQUEST_AD_SERVER_ADDRESS];
-    NSURLQueryItem *sourceAppId = [NSURLQueryItem queryItemWithName:REQUEST_SOURCE_APP_ID_KEY value:REQUEST_SOURCE_APP_ID];
-    
-    NSURLQueryItem *skAdNetworkVersion = [NSURLQueryItem
-                                          queryItemWithName:REQUEST_SKADNETWORK_VERSION_KEY
-                                          value:skanVersion];
-    
-    components.queryItems = @[skAdNetworkVersion, sourceAppId];
-    
-    // Sending an Async GET request to the server to get the Ad data.
-    [[[NSURLSession sharedSession] dataTaskWithURL:components.URL
-                                 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (error) {
-            return;
-        }
-        
-        // Step 2: Parsing the data that we got from the Ad Network to fit the `loadProductWithParameters` format in the AdController.
-        NSDictionary *productParameters = [self parseResponseDataToProductParameters:data];
-        
-        if (!productParameters) {
-            return;
-        }
-        
-        // Step 3: Show the AdController with the product data we got from the Ad Network.
-        [self loadProductFromResponseData:productParameters];
-    }] resume];
+    NSDictionary *parameters = @{
+        @"signature": @"<ENTER_SIGNATURE_HERE>",
+        @"campaignId": @"<ENTER_CAMPAIGN_ID_HERE>", // A number between 1-100
+        @"adNetworkId": @"<ENTER_AD_NETWORK_ID_HERE>",
+        @"nonce": @"<ENTER_NONCE_HERE>",
+        @"timestamp": @"<ENTER_TIMESTAMP_HERE>",
+        @"sourceAppId": @"<ENTER_SOURCE_APP_ID_HERE>", // Test 0
+        @"id": @"<ENTER_AD_NETWORK_APP_ID_HERE>", // The product you want to advertise
+        @"adNetworkVersion": @"<ENTER_VERSION_HERE>",
+        @"sourceIdentifier": @"<ENTER_SOURCE_IDENTIFIER_HERE>", // A number between 1-9999
+    };
+    NSError *serializationError = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:parameters
+                                                   options:0
+                                                     error:&serializationError];
+
+    if (serializationError) {
+        NSLog(@"JSON serialization failed: %@", serializationError.localizedDescription);
+        return;
+    }
+    NSDictionary *productParameters = [self parseResponseDataToProductParameters:data];
+    [self loadProductFromResponseData:productParameters];
 }
 
 - (void)loadProductFromResponseData:(NSDictionary *)productParameters {

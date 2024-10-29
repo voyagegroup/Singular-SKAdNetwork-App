@@ -8,11 +8,12 @@
 #import <UIKit/UIKit.h>
 
 // Important: Don't forget to import the `SKStoreProductViewController` header
-#import <StoreKit/SKStoreProductViewController.h>
+// #import <StoreKit/SKStoreProductViewController.h>
+#import <StoreKit/StoreKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AdController : SKStoreProductViewController {
+@interface AdController : UIViewController <SKStoreProductViewControllerDelegate> {
     NSDictionary* productParameters;
 }
 
